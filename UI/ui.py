@@ -31,11 +31,11 @@ class Board_displayer(chess.Board):
         self.white_piece_images = {}
         self.active_piece = -1
         self.active_moves = []
-        self.active_piece_image = self.__load_png(f"./img/other/active_piece.png")
-        self.possible_move_image = self.__load_png(f"./img/other/possible_move.png")
+        self.active_piece_image = self.__load_png(f"./ui/img/other/active_piece.png")
+        self.possible_move_image = self.__load_png(f"./ui/img/other/possible_move.png")
         for letter in letters:
-            self.black_piece_images[letter] = self.__load_png(f"./img/black/{letter}.png")
-            self.white_piece_images[letter] = self.__load_png(f"./img/white/{letter}.png")
+            self.black_piece_images[letter] = self.__load_png(f"./ui/img/black/{letter}.png")
+            self.white_piece_images[letter] = self.__load_png(f"./ui/img/white/{letter}.png")
         
 
 
@@ -44,7 +44,9 @@ class Board_displayer(chess.Board):
         Creates a thread that shows actual board on pygame screen
         """
         self.thread_to_display = threading.Thread(target = self.__display)
+        print("Starting")
         self.thread_to_display.start()
+        print("Started")
 
 
     def __display(self):
@@ -218,12 +220,4 @@ class Board_displayer(chess.Board):
 
 
 
-        
-if __name__ == "__main__":
-    board = Board_displayer(fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
-    board.display()
-    #board.push_san("a6")
-
-    
-
-
+      
