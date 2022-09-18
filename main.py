@@ -10,7 +10,7 @@ def main(args):
     if args.display:
         board.display()
 
-    minimax(board, 3, -math.inf, math.inf, True)
+    minimax(board, 5, -math.inf, math.inf, True)
     
         
 if __name__ == "__main__":

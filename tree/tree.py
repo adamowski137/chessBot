@@ -4,15 +4,16 @@ import time
 
 number_of_positions = 0
 
-def static_evaluation_of_position(position):
-    """
-    Fake evaluation function that draws number from (-3.0, 3.0),
-    but also increments Counter.number_of_positions
-    """
-    global number_of_positions
-    number_of_positions += 1
-    return random.uniform(-3.0, 3.0)
 
+def static_evaluation_of_position(position):
+    figures = position.piece_map()
+
+    pieces = {"p": -1, "P": 1, "n": -3, "N": 3, "b": -3, "B":3, "r": -5, "R":5, "q":-9, "Q":9, "k": -0, "K": 0 }
+    sum = 0
+    for i, value in figures.items():
+        sum += pieces[value.symbol()]
+    return sum
+        
 
 def children(position):
     """
@@ -26,8 +27,10 @@ def children(position):
 
 def minimax(position, depth, alpha, beta, maximizingPlayer):
     if depth == 0: #or checkmate, or stalemate etc.
-        print(position.fen())
-        return static_evaluation_of_position(position)
+        eval = static_evaluation_of_position(position)
+        if abs(eval) > 5:
+            print(f"{position.fen()}, --- {eval}")
+        return eval
     if maximizingPlayer:
         maxEval = -1000000
         for child in children(position):
