@@ -5,20 +5,7 @@ import time
 import math as m
 
 
-
-# chess module indexes squares 0 - 63 like that:
-# 1 56           63
-# 2
-# 3
-# 4
-# 5
-# 6
-# 7
-# 8 0             7
-#   a b c d e f g h
-
-
-class Board_displayer(chess.Board):
+class Board(chess.Board):
     def __init__(self, square_size = 60, **args):
         chess.Board.__init__(self, **args)
         self.square_size = square_size
@@ -43,10 +30,7 @@ class Board_displayer(chess.Board):
         """
         Creates a thread that shows actual board on pygame screen
         """
-        self.thread_to_display = threading.Thread(target = self.__display)
-        print("Starting")
-        self.thread_to_display.start()
-        print("Started")
+        self.__display()
 
 
     def __display(self):
