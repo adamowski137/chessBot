@@ -1,13 +1,16 @@
 import chess
 from tree.tree import *
-from ui.ui import Board_displayer
+from ui.ui import Board
 import argparse
+import math
 
-def run(args):
+def main(args):
+    board = Board(fen = args.fen)
+
     if args.display:
-        board = Board_displayer(fen = args.fen)
         board.display()
 
+    minimax(board, 3, -math.inf, math.inf, True)
     
         
 if __name__ == "__main__":
@@ -16,6 +19,7 @@ if __name__ == "__main__":
 
     # Values
     parser.add_argument('-f', '--fen', help="Name of the input XML file.", default='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', required=False)
+    parser.add_argument('-d', '--depth', help="Maximum search depth.", default=3, type=float, required=False)
 
     # Flags
     parser.add_argument('--display', dest="display",
@@ -26,7 +30,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    run(args)
+    main(args)
 
     
 
