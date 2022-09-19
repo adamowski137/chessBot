@@ -10,6 +10,7 @@ class Tree:
         self.best_move = None
         self.eval = 0
         self.positions = 0
+        self.transposition_table = dict()
 
     def static_evaluation_of_board(self, board, depth):
         outcome = board.outcome()
@@ -34,6 +35,7 @@ class Tree:
         self.positions = 0
         self.eval = self.__minimax(board, self.depth, -
                                    math.inf, math.inf, board.turn)
+        self.transposition_table = dict()
 
         return self.eval, self.best_move
 
@@ -54,11 +56,19 @@ class Tree:
             eval = self.static_evaluation_of_board(board, depth)
             return eval
 
+        self.positions += 1
+
         if maximizingPlayer:
             maxEval = -1000000
             for child in self.__children(board):
-                eval = self.__minimax(child, depth -
-                                      1, alpha, beta, False)
+                eval = 0
+                if child.fen() not in self.transposition_table:
+                    eval = self.__minimax(child, depth -
+                                          1, alpha, beta, False)
+                else:
+                    eval = self.transposition_table[child.fen()]
+
+                self.transposition_table[board.fen()] = eval
 
                 if eval >= maxEval:
                     maxEval = eval
@@ -74,8 +84,14 @@ class Tree:
         else:
             minEval = 1000000
             for child in self.__children(board):
-                eval = self.__minimax(child, depth -
-                                      1, alpha, beta,  True)
+                eval = 0
+                if child.fen() not in self.transposition_table:
+                    eval = self.__minimax(child, depth -
+                                          1, alpha, beta,  True)
+                else:
+                    eval = self.transposition_table[child.fen()]
+
+                self.transposition_table[board.fen()] = eval
 
                 if eval <= minEval:
                     minEval = eval

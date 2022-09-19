@@ -18,7 +18,7 @@ def main(args):
         if move is None:
             break
 
-        print(eval, move)
+        print(eval, move, tree.positions)
         board.push(move)
 
 
