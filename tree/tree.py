@@ -28,8 +28,7 @@ def children(position):
 def minimax(position, depth, alpha, beta, maximizingPlayer):
     if depth == 0: #or checkmate, or stalemate etc.
         eval = static_evaluation_of_position(position)
-        if abs(eval) > 5:
-            print(f"{position.fen()}, --- {eval}")
+        #print(f"{position.fen()}, --- {eval}")
         return eval
     if maximizingPlayer:
         maxEval = -1000000
@@ -39,7 +38,7 @@ def minimax(position, depth, alpha, beta, maximizingPlayer):
             alpha = max(alpha, eval)
             if beta <= alpha:
                 position.pop()
-                break
+                break     
         return maxEval
     else:
         minEval = 1000000
