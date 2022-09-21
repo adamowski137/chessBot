@@ -1,7 +1,7 @@
 import chess
-import pygame as pg
 import threading
 import time
+import pygame as pg
 import math as m
 
 
@@ -30,7 +30,9 @@ class Board(chess.Board):
         """
         Creates a thread that shows actual board on pygame screen
         """
-        self.__display()
+       #self.__display()
+        start = threading.Thread(target = self.__display)
+        start.start()
 
 
     def __display(self):

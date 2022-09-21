@@ -1,25 +1,36 @@
 import chess
 from tree.tree import *
-from ui.ui import Board
 import argparse
 import math
+from static_evaluation.static_evaluation import static_evaluation_function
+import time
 
 
 def main(args):
-    board = Board(fen=args.fen)
-    tree = Tree(depth=args.depth)
+    tree = Tree()
 
     if args.display:
+        from UI.ui import Board
+        board = Board(fen=args.fen)
+        print("DISPLAY")
         board.display()
+    else:
+        board = chess.Board(fen=args.fen)
 
-    for i in range(100):
-        eval, move = tree.minimax(board)
+    while True:
+        if board.turn == chess.BLACK:
+            print("WAIT FOR THE MOVE")
+            eval, move = tree.minimax(
+                board, args.depth, static_evaluation_function)
+            if move is None:
+                print("MOVE IS NONE")
+                break
+            print(eval, move)
+            board.push(move)
+        time.sleep(0.5)
 
-        if move is None:
-            break
-
-        print(eval, move, tree.positions)
-        board.push(move)
+    # for i in range(100):
+    #     eval, move = tree.minimax(board, static_evaluation_function)
 
 
 if __name__ == "__main__":

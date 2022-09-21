@@ -5,34 +5,17 @@ import math
 
 
 class Tree:
-    def __init__(self, depth):
-        self.depth = depth
+    def __init__(self):
         self.best_move = None
         self.eval = 0
         self.positions = 0
         self.transposition_table = dict()
 
-    def static_evaluation_of_board(self, board, depth):
-        outcome = board.outcome()
-        if outcome:
-            if outcome.termination in [chess.Termination.STALEMATE, chess.Termination.INSUFFICIENT_MATERIAL, chess.Termination.FIVEFOLD_REPETITION, chess.Termination.SEVENTYFIVE_MOVES, chess.Termination.THREEFOLD_REPETITION]:
-                return 0
-            if outcome.termination is chess.Termination.CHECKMATE and outcome.winner is True:
-                return 100000 + depth
-            elif outcome.termination is chess.Termination.CHECKMATE and outcome.winner is False:
-                return -100000 - depth
-
-        figures = board.piece_map()
-        pieces = {"p": -1, "P": 1, "n": -3, "N": 3, "b": -3, "B": 3,
-                  "r": -5, "R": 5, "q": -9, "Q": 9, "k": -0, "K": 0}
-        sum = 0
-        for i, value in figures.items():
-            sum += pieces[value.symbol()]
-        return sum
-
-    def minimax(self, board):
+    def minimax(self, board, depth, static_evaluation_function):
+        self.depth = depth
         self.best_move = None
         self.positions = 0
+        self.static_evaluation_function = static_evaluation_function
         self.eval = self.__minimax(board, self.depth, -
                                    math.inf, math.inf, board.turn)
         self.transposition_table = dict()
@@ -53,7 +36,7 @@ class Tree:
 
     def __minimax(self, board, depth, alpha, beta, maximizingPlayer):
         if depth == 0 or board.outcome():  # or checkmate, or stalemate etc.
-            eval = self.static_evaluation_of_board(board, depth)
+            eval = self.static_evaluation_function(board, depth)
             return eval
 
         self.positions += 1
