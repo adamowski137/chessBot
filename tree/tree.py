@@ -5,22 +5,22 @@ import math
 
 
 class Tree:
-    def __init__(self):
+    def __init__(self, depth):
         self.best_move = None
-        self.eval = 0
+        self.evaluation = 0
         self.positions = 0
+        self.depth = depth
         self.transposition_table = dict()
 
-    def minimax(self, board, depth, static_evaluation_function):
-        self.depth = depth
+    def minimax(self, board, static_evaluation_function):
         self.best_move = None
         self.positions = 0
         self.static_evaluation_function = static_evaluation_function
-        self.eval = self.__minimax(board, self.depth, -
-                                   math.inf, math.inf, board.turn)
+        self.evaluation = self.__minimax(board, self.depth, -
+                                         math.inf, math.inf)
         self.transposition_table = dict()
 
-        return self.eval, self.best_move
+        return self.evaluation, self.best_move
 
     def __children(self, board):
         """
@@ -34,31 +34,31 @@ class Tree:
             yield board
             board.pop()
 
-    def __minimax(self, board, depth, alpha, beta, maximizingPlayer):
+    def __minimax(self, board, depth, alpha, beta):
         if depth == 0 or board.outcome():  # or checkmate, or stalemate etc.
-            eval = self.static_evaluation_function(board, depth)
-            return eval
+            evaluation = self.static_evaluation_function(board, depth)
+            return evaluation
 
         self.positions += 1
 
-        if maximizingPlayer:
+        if board.turn:
             maxEval = -1000000
             for child in self.__children(board):
-                eval = 0
+                evaluation = 0
                 if child.fen() not in self.transposition_table:
-                    eval = self.__minimax(child, depth -
-                                          1, alpha, beta, False)
+                    evaluation = self.__minimax(child, depth -
+                                                1, alpha, beta)
                 else:
-                    eval = self.transposition_table[child.fen()]
+                    evaluation = self.transposition_table[child.fen()]
 
-                self.transposition_table[board.fen()] = eval
+                self.transposition_table[board.fen()] = evaluation
 
-                if eval >= maxEval:
-                    maxEval = eval
+                if evaluation > maxEval:
+                    maxEval = evaluation
                     if depth == self.depth:
                         self.best_move = board.peek()
 
-                alpha = max(alpha, eval)
+                alpha = max(alpha, evaluation)
                 if beta <= alpha:
                     board.pop()
                     break
@@ -67,21 +67,21 @@ class Tree:
         else:
             minEval = 1000000
             for child in self.__children(board):
-                eval = 0
+                evaluation = 0
                 if child.fen() not in self.transposition_table:
-                    eval = self.__minimax(child, depth -
-                                          1, alpha, beta,  True)
+                    evaluation = self.__minimax(child, depth -
+                                                1, alpha, beta)
                 else:
-                    eval = self.transposition_table[child.fen()]
+                    evaluation = self.transposition_table[child.fen()]
 
-                self.transposition_table[board.fen()] = eval
+                self.transposition_table[board.fen()] = evaluation
 
-                if eval <= minEval:
-                    minEval = eval
+                if evaluation < minEval:
+                    minEval = evaluation
                     if depth == self.depth:
                         self.best_move = board.peek()
 
-                beta = min(beta, eval)
+                beta = min(beta, evaluation)
                 if beta <= alpha:
                     board.pop()
                     break

@@ -7,7 +7,7 @@ import time
 
 
 def main(args):
-    tree = Tree()
+    tree = Tree(args.depth)
 
     if args.display:
         from UI.ui import Board
@@ -18,10 +18,10 @@ def main(args):
         board = chess.Board(fen=args.fen)
 
     while True:
-        if board.turn == chess.BLACK:
+        if board.turn == chess.BLACK or args.self_play:
             print("WAIT FOR THE MOVE")
             eval, move = tree.minimax(
-                board, args.depth, static_evaluation_function)
+                board, static_evaluation_function)
             if move is None:
                 print("MOVE IS NONE")
                 break
@@ -54,9 +54,12 @@ if __name__ == "__main__":
     # Flags
     parser.add_argument('--display', dest="display",
                         help="Run the UI", action='store_true')
+    parser.add_argument('--self-play', dest="self_play",
+                        help="Play the game against itself.", action='store_true')
 
     # Default flags
     parser.set_defaults(display=False)
+    parser.set_defaults(self_play=False)
 
     args = parser.parse_args()
 
