@@ -27,6 +27,14 @@ def main(args):
                 break
             print(eval, move)
             board.push(move)
+        elif not args.display:
+            move = input("Input move: ")
+            move = chess.Move.from_uci(move)
+            if move in board.legal_moves:
+                board.push(move)
+            else:
+                print(f"Incorrect move.\nEnded with position: {board.fen()}")
+                exit()
         time.sleep(0.5)
 
     # for i in range(100):
