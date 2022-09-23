@@ -20,13 +20,14 @@ def main(args):
     while True:
         if board.turn == chess.BLACK or args.self_play:
             print("WAIT FOR THE MOVE")
-            eval, move = tree.minimax(
+            eval, move = tree.iterative_dfs(
                 board, static_evaluation_function)
             if move is None:
                 print("MOVE IS NONE")
                 break
-            print(eval, move)
+            print(eval, move, tree.positions)
             board.push(move)
+            print(board)
         elif not args.display:
             move = input("Input move: ")
             move = chess.Move.from_uci(move)
@@ -35,10 +36,7 @@ def main(args):
             else:
                 print(f"Incorrect move.\nEnded with position: {board.fen()}")
                 exit()
-        time.sleep(0.5)
-
-    # for i in range(100):
-    #     eval, move = tree.minimax(board, static_evaluation_function)
+        # time.sleep(0.5)
 
 
 if __name__ == "__main__":
