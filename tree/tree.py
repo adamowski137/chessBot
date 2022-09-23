@@ -9,6 +9,7 @@ class Tree:
         self.best_move = None
         self.evaluation = 0
         self.positions = 0
+        self.max_positions = 5000
         self.depth = depth
         self.transposition_table = dict()
 
@@ -19,9 +20,14 @@ class Tree:
 
         max_depth = int(self.depth)
         for i in range(1, max_depth+1):
+            if self.positions > self.max_positions:
+                print(f"Broke at {i}/{max_depth}")
+                break
             self.depth = i
             self.evaluation = self.__minimax(
                 board, self.depth, -math.inf, math.inf)
+
+        self.depth = max_depth
 
         return self.evaluation, self.best_move
 
@@ -71,7 +77,8 @@ class Tree:
 
     def __minimax(self, board, depth, alpha, beta):
         self.positions += 1
-        if depth == 0 or board.outcome():  # or checkmate, or stalemate etc.
+        # or checkmate, or stalemate etc.
+        if depth == 0 or board.outcome():
             evaluation = self.static_evaluation_function(board, depth)
             return evaluation
 
