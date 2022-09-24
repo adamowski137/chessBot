@@ -1,6 +1,6 @@
 import chess
 from tree.tree import *
-from ui.ui import Board
+from UI.ui import Board
 import argparse
 import math
 
