@@ -29,7 +29,7 @@ def main(args):
             if move is None:
                 print("Can't make a move.")
                 break
-            print(eval, move, tree.positions)
+            print(round(eval, 2), move, tree.positions)
             board.push(move)
             print(board)
         elif not args.display:

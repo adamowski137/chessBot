@@ -3,9 +3,6 @@ import random
 import time
 import math
 
-number_of_positions = 0
-
-
 
 class Tree:
     def __init__(self, depth):
