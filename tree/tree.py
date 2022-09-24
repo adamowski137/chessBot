@@ -1,15 +1,9 @@
 import chess
 import random
 import time
-import evaluation
 import math
 
 number_of_positions = 0
-
-
-def static_evaluation_of_position(position):
-    print(position.legal_moves.count())
-    figures = position.piece_map()
 
 
 

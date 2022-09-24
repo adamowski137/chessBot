@@ -1,7 +1,6 @@
 import chess
 import chess.pgn
 from tree.tree import *
-from UI.ui import Board
 import argparse
 import math
 from static_evaluation.static_evaluation import static_evaluation_function
@@ -13,7 +12,7 @@ def main(args):
     tree = Tree(args.depth)
 
     if args.display:
-        from ui.ui import Board
+        from UI.ui import Board
         board = Board(fen=args.fen)
         print("DISPLAY")
         board.display()

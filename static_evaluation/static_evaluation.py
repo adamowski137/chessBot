@@ -1,6 +1,26 @@
 import chess
 
+def material(position):
+    figures = position.piece_map()
+    amounts = {"p": 0, "P": 0, "n": 0, "N": 0, "b": 0, "B": 0, "r": 0, "R": 0, "q": 0, "Q": 0, "k": 0, "K": 0 }
+    pieces = {"p": -1, "P": 1, "n": -3, "N": 3, "b": -3, "B":3, "r": -5, "R":5, "q":-9, "Q":9, "k": -0, "K": 0 }
+    sum = 0
+    for i, value in figures.items():
+        sum += pieces[value.symbol()]
+        amounts[value.symbol()] += 1
+    print(amounts);
+    return sum
 
+def controlledTiles(position):
+    attackerTiles = position.legal_moves.count()
+    position.push(chess.Move.null())
+    defenderTiles = position.legal_moves.count()
+    position.pop()
+    return attackerTiles - defenderTiles
+
+
+def evaluate(position):
+    return material(position) + 0.1 * controlledTiles(position)
 
 def static_evaluation_function(board, depth):
         outcome = board.outcome()
@@ -18,10 +38,4 @@ def static_evaluation_function(board, depth):
             elif outcome.termination is chess.Termination.CHECKMATE and outcome.winner is False:
                 return -100000 - depth
 
-        figures = board.piece_map()
-        pieces = {"p": -1, "P": 1, "n": -3, "N": 3, "b": -3, "B": 3,
-                  "r": -5, "R": 5, "q": -9, "Q": 9, "k": -0, "K": 0}
-        sum = 0
-        for i, value in figures.items():
-            sum += pieces[value.symbol()]
-        return sum
+        return evaluate(board)
