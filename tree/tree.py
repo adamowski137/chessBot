@@ -18,7 +18,6 @@ class Tree:
         self.static_evaluation_function = static_evaluation_function
         self.evaluation = self.__minimax(board, self.depth, -
                                          math.inf, math.inf)
-        self.transposition_table = dict()
 
         return self.evaluation, self.best_move
 
