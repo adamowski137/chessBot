@@ -1,9 +1,11 @@
 import chess
+import chess.pgn
 from tree.tree import *
 import argparse
 import math
 from static_evaluation.static_evaluation import static_evaluation_function
 import time
+from timeit import default_timer as timer
 
 
 def main(args):
@@ -19,14 +21,17 @@ def main(args):
 
     while True:
         if board.turn == chess.BLACK or args.self_play:
-            print("WAIT FOR THE MOVE")
-            eval, move = tree.minimax(
+            start = timer()
+            eval, move = tree.iterative_dfs(
                 board, static_evaluation_function)
+            end = timer()
+            print("Time:", end - start)
             if move is None:
-                print("MOVE IS NONE")
+                print("Can't make a move.")
                 break
-            print(eval, move)
+            print(round(eval, 2), move, tree.positions)
             board.push(move)
+            print(board)
         elif not args.display:
             move = input("Input move: ")
             move = chess.Move.from_uci(move)
@@ -34,11 +39,10 @@ def main(args):
                 board.push(move)
             else:
                 print(f"Incorrect move.\nEnded with position: {board.fen()}")
-                exit()
-        time.sleep(0.5)
+                break
 
-    # for i in range(100):
-    #     eval, move = tree.minimax(board, static_evaluation_function)
+    game = chess.pgn.Game.from_board(board)
+    print(game)
 
 
 if __name__ == "__main__":
