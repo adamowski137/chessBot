@@ -5,16 +5,16 @@ import math
 
 
 class Tree:
-    def __init__(self, depth):
+    def __init__(self, depth, static_evaluation_function):
         self.best_move = None
         self.evaluation = 0
         self.positions = 0
         self.max_positions = 5000
         self.depth = depth
         self.transposition_table = dict()
-
-    def iterative_dfs(self, board, static_evaluation_function):
         self.static_evaluation_function = static_evaluation_function
+
+    def iterative_dfs(self, board):
         self.positions = 0
         self.transposition_table = dict()
 
@@ -31,10 +31,9 @@ class Tree:
 
         return self.evaluation, self.best_move
 
-    def minimax(self, board, static_evaluation_function):
+    def minimax(self, board):
         self.best_move = None
         self.positions = 0
-        self.static_evaluation_function = static_evaluation_function
         self.evaluation = self.__minimax(board, self.depth, -
                                          math.inf, math.inf)
 

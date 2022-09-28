@@ -2,17 +2,22 @@ import random
 import math
 import numpy as np
 
+from tree.tree import *
+from static_evaluation.static_evaluation import *
+
 
 def sigmoid(x):
-    if x>=0:
+    if x >= 0:
         return 1 / (1 + np.exp(-x))
     else:
-        return 1 - 1/(1  + np.exp(x))
+        return 1 - 1/(1 + np.exp(x))
+
 
 class Player():
-    def __init__(self, n_of_parameters):
+    def __init__(self, depth):
         self.weights = self.__initialize_weights(n_of_parameters)
-        pass
+        # generate evaluation_function instead. metaprogramming lessssgooooooooo
+        self.tree = Tree(depth, static_evaluation_function)
 
     def get_eval(self):
         parameters = [1, 5, 2, -1]  # get parameters from outside
@@ -24,17 +29,16 @@ class Player():
 
         return get_eval
 
-
-
     def __initialize_weights(self, n):
         for i in range(n):
             self.weights.append(random.random() * 2 - 1)
+
 
 class NN:
     class Layer:
         def __init__(self, my_size, previous_size):
 
-            #my_size is number of nodes in this layer
+            # my_size is number of nodes in this layer
             self.my_size = my_size
 
             # previous_size is number of nodes in preceding layer
@@ -59,7 +63,7 @@ class NN:
 
         def set_weights(self, array):
             arr = np.array(array)
-            if self.weights.shape != arr.shape:  
+            if self.weights.shape != arr.shape:
                 print(f"""ERROR: Shapes of weights does not match, 
                 should be {(self.weights.shape)} but got {(arr.shape)}""")
                 raise ValueError
@@ -72,7 +76,7 @@ class NN:
                 should be {(self.biases.shape)} but got {(arr.shape)}""")
                 raise ValueError
             self.biases = arr
-            
+
     def __init__(self, structure):
         """
         Structure is a numpy 1-D array containing sizes of layers
@@ -80,23 +84,23 @@ class NN:
         """
 
         # Creating table of layers, without input layer, as we count it as non-existing
-        self.layers = np.array([self.Layer(structure[i], structure[i - 1]) 
-            for i in range(1, len(structure))])
-        
+        self.layers = np.array([self.Layer(structure[i], structure[i - 1])
+                                for i in range(1, len(structure))])
+
     def __str__(self):
         out = ''
         for layer in self.layers:
-            out+= "\n\n"
-            out+= str(layer)
+            out += "\n\n"
+            out += str(layer)
             out += "\nWeights:\n"
             out += str(layer.weights)
             out += "\nBiases\n"
             out += str(layer.biases)
         return out
-    
+
     def __getitem__(self, index):
         return self.layers[index]
-    
+
     def __call__(self, data):
         """
         function that gets 1-D array of size of the input layer and returns the answer
@@ -106,7 +110,3 @@ class NN:
         for layer in self.layers:
             answer = layer.feed(answer)
         return answer
-
-
-
-        

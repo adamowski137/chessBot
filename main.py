@@ -8,8 +8,8 @@ import time
 from timeit import default_timer as timer
 
 
-def main(args):
-    tree = Tree(args.depth)
+def simple_play(args):
+    tree = Tree(args.depth, static_evaluation_function)
 
     if args.display:
         from UI.ui import Board
@@ -23,7 +23,7 @@ def main(args):
         if board.turn == chess.BLACK or args.self_play:
             start = timer()
             eval, move = tree.iterative_dfs(
-                board, static_evaluation_function)
+                board)
             end = timer()
             print("Time:", end - start)
             if move is None:
@@ -41,8 +41,9 @@ def main(args):
                 print(f"Incorrect move.\nEnded with position: {board.fen()}")
                 break
 
-    game = chess.pgn.Game.from_board(board)
-    print(game)
+
+def genetic_algorithm(args):
+    population = [Player(args.depth) for i in range(args.population_size)]
 
 
 if __name__ == "__main__":
@@ -54,6 +55,9 @@ if __name__ == "__main__":
                         default='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', required=False)
     parser.add_argument('-d', '--depth', help="Maximum search depth.",
                         default=6, type=float, required=False)
+
+    parser.add_argument('-p', '--population-size',
+                        help="Population size. Must be at least 2.", default=0, type=int)
 
     # Flags
     parser.add_argument('--display', dest="display",
@@ -67,4 +71,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(args)
+    if args.population_size > 2:
+        genetic_algorithm(args.population_size)
+    else:
+        simple_play(args)
