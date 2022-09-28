@@ -1,11 +1,14 @@
-import chess
-import chess.pgn
-from tree.tree import *
 import argparse
 import math
-from static_evaluation.static_evaluation import static_evaluation_function
 import time
 from timeit import default_timer as timer
+
+import chess
+import chess.pgn
+
+from tree.tree import Tree
+from static_evaluation.static_evaluation import static_evaluation_function
+from genetic.population import Population
 
 
 def simple_play(args):
@@ -43,7 +46,9 @@ def simple_play(args):
 
 
 def genetic_algorithm(args):
-    population = [Player(args.depth) for i in range(args.population_size)]
+    population = Population(args.population_size, args.depth)
+    pairs = population.random_pairs()
+    population.run_games(pairs, fen=args.fen)
 
 
 if __name__ == "__main__":
@@ -54,10 +59,10 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--fen', help="Name of the input XML file.",
                         default='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', required=False)
     parser.add_argument('-d', '--depth', help="Maximum search depth.",
-                        default=6, type=float, required=False)
+                        default=16, type=float, required=False)
 
     parser.add_argument('-p', '--population-size',
-                        help="Population size. Must be at least 2.", default=0, type=int)
+                        help="Population size. Must be even and at least 2.", default=0, type=int)
 
     # Flags
     parser.add_argument('--display', dest="display",
@@ -71,7 +76,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    if args.population_size > 2:
-        genetic_algorithm(args.population_size)
+    if args.population_size > 1:
+        genetic_algorithm(args)
     else:
         simple_play(args)

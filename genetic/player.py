@@ -15,23 +15,11 @@ def sigmoid(x):
 
 class Player():
     def __init__(self, depth):
-        self.weights = self.__initialize_weights(n_of_parameters)
         # generate evaluation_function instead. metaprogramming lessssgooooooooo
         self.tree = Tree(depth, static_evaluation_function)
 
-    def get_eval(self):
-        parameters = [1, 5, 2, -1]  # get parameters from outside
-
-        evaluation = 0
-
-        for w, par in zip(self.weights, parameters):
-            evaluation += sigmoid(w*par)
-
-        return get_eval
-
-    def __initialize_weights(self, n):
-        for i in range(n):
-            self.weights.append(random.random() * 2 - 1)
+    def move(self, board):
+        return self.tree.iterative_dfs(board)
 
 
 class NN:
