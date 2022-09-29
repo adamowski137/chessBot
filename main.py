@@ -17,7 +17,7 @@ def simple_play(args):
     white_player = Player(args.depth) if args.self_play else None
     black_player = Player(args.depth)
 
-    game = Game(white_player, black_player, display=args.display)
+    game = Game(white_player, black_player, fen=args.fen, display=args.display)
 
     game.play()
 
