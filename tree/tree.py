@@ -5,12 +5,18 @@ import math
 
 
 class Tree:
-    def __init__(self, depth, static_evaluation_function):
+    def __init__(self, depth, static_evaluation_function, probability=0.00001):
         self.best_move = None
         self.evaluation = 0
         self.positions = 0
-        self.max_positions = 10000
+        self.max_positions = 35000
+
         self.depth = depth
+        self.min_depth = depth // 2 + 1
+        self.min_probability = probability
+
+        self.max_reached_depth = 0
+
         self.transposition_table = dict()
         self.static_evaluation_function = static_evaluation_function
 
@@ -19,13 +25,16 @@ class Tree:
         self.transposition_table = dict()
 
         max_depth = int(self.depth)
-        for i in range(1, max_depth+1):
+        self.max_reached_depth = 0
+        for i in range(1, max_depth+1, 1):
             if self.positions > self.max_positions:
-                print(f"Broke at {i}/{max_depth}")
+                print(
+                    f"Broke after min:{(i-1)//2 + 1}/{max_depth}, reached: {self.max_reached_depth}")
                 break
             self.depth = i
+            self.min_depth = self.depth // 2 + 1
             self.evaluation = self.__minimax(
-                board, self.depth, -math.inf, math.inf)
+                board, self.depth, 1.0, -math.inf, math.inf)
 
         self.depth = max_depth
 
@@ -34,12 +43,12 @@ class Tree:
     def minimax(self, board):
         self.best_move = None
         self.positions = 0
-        self.evaluation = self.__minimax(board, self.depth, -
+        self.evaluation = self.__minimax(board, self.depth, 1.0, -
                                          math.inf, math.inf)
 
         return self.evaluation, self.best_move
 
-    def __children(self, board):
+    def __children(self, board, depth):
         """
         Function that yields all boards available from the given one,
         in a sorted order by calculated evaluations.
@@ -48,45 +57,71 @@ class Tree:
         evaluations = []
 
         legal = board.legal_moves
+        n = 0
 
+        # TODO: faster function find
+        cur_pieces = len(board.piece_map().items())
+        is_check = True if board.is_check() else False
+
+        d = self.depth - depth
+
+        can_capture = False
         for move in legal:
             board.push(move)
-
-            moves.append(move)
-            evaluation = 0
-            if (board.fen(), self.depth - 1) in self.transposition_table:
-                evaluation = self.transposition_table[(
-                    board.fen(), self.depth - 1)]
-            evaluations.append(evaluation)
-
+            new_pieces = len(board.piece_map())
+            if new_pieces < cur_pieces:
+                can_capture = True
+                board.pop()
+                break
             board.pop()
 
-        ordered_move_indices = [i[0] for i in sorted(
-            enumerate(evaluations), key=lambda x:x[1])]
+        for move in legal:
+            n += 1
+
+            board.push(move)
+
+            new_pieces = len(board.piece_map())
+
+            if d <= self.depth or is_check or board.is_check() or can_capture:
+                moves.append(move)
+
+                evaluation = 0
+                if (board.fen(), self.depth - 1) in self.transposition_table:
+                    evaluation = self.transposition_table[(
+                        board.fen(), self.depth - 1)]
+                evaluations.append(evaluation)
+
+            board.pop()
 
         if board.turn:
             ordered_move_indices = [i[0] for i in sorted(
                 enumerate(evaluations), key=lambda x:x[1], reverse=True)]
+        else:
+            ordered_move_indices = [i[0] for i in sorted(
+                enumerate(evaluations), key=lambda x:x[1])]
 
         for idx in ordered_move_indices:
             board.push(moves[idx])
-            yield board
+            yield n, board
             board.pop()
 
-    def __minimax(self, board, depth, alpha, beta):
+    def __minimax(self, board, depth, probability, alpha, beta):
         self.positions += 1
         # or checkmate, or stalemate etc.
-        if depth == 0 or board.outcome():
+        if depth == 0 or probability < self.min_probability or board.outcome():
             evaluation = self.static_evaluation_function(board, depth)
             return evaluation
 
+        self.max_reached_depth = max(
+            self.max_reached_depth, self.depth - depth)
+
         if board.turn:
             maxEval = -1000000
-            for child in self.__children(board):
+            for n, child in self.__children(board, depth):
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
-                                                1, alpha, beta)
+                                                1, probability * (1 / n), alpha, beta)
                 else:
                     evaluation = self.transposition_table[(
                         child.fen(), self.depth)]
@@ -107,11 +142,11 @@ class Tree:
             return maxEval
         else:
             minEval = 1000000
-            for child in self.__children(board):
+            for n, child in self.__children(board, depth):
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
-                                                1, alpha, beta)
+                                                1, probability * (1 / n), alpha, beta)
                 else:
                     evaluation = self.transposition_table[(
                         child.fen(), self.depth)]
