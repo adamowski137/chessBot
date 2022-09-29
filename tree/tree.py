@@ -74,9 +74,6 @@ class Tree:
 
             board.pop()
 
-        if not moves:
-            yield 0, []
-
         if board.turn:
             ordered_move_indices = [i[0] for i in sorted(
                 enumerate(evaluations), key=lambda x:x[1], reverse=True)]
@@ -119,11 +116,6 @@ class Tree:
         if board.turn:
             maxEval = -1000000
             for n, child in self.__children(board, depth):
-                if n == 0:
-                    maxEval = max(
-                        maxEval, self.static_evaluation_function(board, depth))
-                    break
-
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
@@ -149,11 +141,6 @@ class Tree:
         else:
             minEval = 1000000
             for n, child in self.__children(board, depth):
-                if n == 0:
-                    minEval = min(
-                        minEval, self.static_evaluation_function(board, depth))
-                    break
-
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
