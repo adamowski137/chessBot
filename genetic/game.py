@@ -37,7 +37,18 @@ class Game():
             return self.__human_play()
 
     def save(self, path):
-        print(self.board.move_stack)
+        if not self.board.move_stack:
+            return
+
+        game = chess.pgn.Game()
+        node = game.add_variation(self.board.move_stack[0])
+        for move in self.board.move_stack[1:]:
+            node = node.add_variation(move)
+
+        with open(path, 'a+') as f:
+            f.write(f"\nGame: {self.name}\n")
+            f.write(f"{game}")
+            f.close()
 
     def __human_play(self):
         computer_player = self.white if self.white else self.black
@@ -71,10 +82,10 @@ class Game():
                     else:
                         print(f"Incorrect move. Try again")
 
-        return self.board.outcome()
+        return self
 
     def __self_play(self):
-        while not self.board.outcome():
+        while not self.board.outcome() and len(self.board.move_stack) < 5:
             start_timer = time.perf_counter()
             evaluation, move = 0, None
 
@@ -99,4 +110,4 @@ class Game():
 
             self.board.push(move)
 
-        return self.board.outcome()
+        return self

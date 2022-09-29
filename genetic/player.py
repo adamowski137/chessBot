@@ -17,7 +17,7 @@ class Player():
     def __init__(self, depth):
         # generate evaluation_function instead. metaprogramming lessssgooooooooo
         self.evaluation_function = Evaluation(points_weight=random.uniform(
-            0.8, 1.2), tiles_weight=random.uniform(0.01, 0.2))
+            0.5, 1.5), tiles_weight=random.uniform(0.0, 1.0))
         self.tree = Tree(depth, self.evaluation_function)
         self.fitness = 0
 

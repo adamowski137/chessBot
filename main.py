@@ -2,6 +2,7 @@ import argparse
 import math
 import time
 from timeit import default_timer as timer
+import os
 
 import chess
 import chess.pgn
@@ -21,13 +22,18 @@ def simple_play(args):
 
     game.play()
 
+    if args.save_games:
+        game.save("games.txt")
+
 
 def genetic_algorithm(args):
     population = Population(args.population_size, args.depth)
     pairs = population.random_pairs(both_sides=False)
 
     population.run_games(pairs, fen=args.fen)
-    population.save_games()
+
+    if args.save_games:
+        population.save_games(os.path.join(args.out, "games.txt"))
 
 
 if __name__ == "__main__":
@@ -39,19 +45,23 @@ if __name__ == "__main__":
                         default='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', required=False)
     parser.add_argument('-d', '--depth', help="Maximum search depth.",
                         default=16, type=float, required=False)
-
     parser.add_argument('-p', '--population-size',
                         help="Population size. Must be even and at least 2.", default=0, type=int)
+    parser.add_argument('-o', '--out', help="Directory to save output files.", type=str,
+                        default='out/', required=False)
 
     # Flags
     parser.add_argument('--display', dest="display",
                         help="Run the UI", action='store_true')
     parser.add_argument('--self-play', dest="self_play",
                         help="Play the game against itself.", action='store_true')
+    parser.add_argument('--save-games', dest="save_games",
+                        help="Save played games into a file.", action='store_true')
 
     # Default flags
     parser.set_defaults(display=False)
     parser.set_defaults(self_play=False)
+    parser.set_defaults(save_games=False)
 
     args = parser.parse_args()
 
