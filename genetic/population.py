@@ -6,8 +6,8 @@ from genetic.game import Game, GameType
 
 
 class Population():
-    def __init__(self, size, depth):
-        self.population = [Player(depth) for i in range(size)]
+    def __init__(self, size, depth, min_depth):
+        self.population = [Player(depth, min_depth) for i in range(size)]
         self.games = []
         self.generation = 0
         pass

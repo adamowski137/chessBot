@@ -16,10 +16,11 @@ from genetic.game import Game
 
 
 def simple_play(args):
-    white_player = Player(args.depth) if args.self_play else None
+    white_player = Player(
+        args.depth) if args.self_play else None
     black_player = Player(args.depth)
 
-    game = Game(white_player, black_player, display=args.display)
+    game = Game(white_player, black_player, fen=args.fen, display=args.display)
 
     game.play()
 
@@ -28,7 +29,7 @@ def simple_play(args):
 
 
 def genetic_algorithm(args):
-    population = Population(args.population_size, args.depth)
+    population = Population(args.population_size, args.depth, args.min_depth)
     pairs = population.random_pairs(both_sides=False)
 
     population.run_games(pairs, fen=args.fen)
@@ -51,7 +52,8 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--fen', help="Name of the input XML file.",
                         default='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', required=False)
     parser.add_argument('-d', '--depth', help="Maximum search depth.",
-                        default=16, type=float, required=False)
+                        default=6, type=int, required=False)
+
     parser.add_argument('-p', '--population-size',
                         help="Population size. Must be even and at least 2.", default=0, type=int)
     parser.add_argument('-o', '--out', help="Directory to save output files.", type=str,

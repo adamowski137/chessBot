@@ -6,7 +6,7 @@ import math as m
 
 
 class Board(chess.Board):
-    def __init__(self, square_size = 60, **args):
+    def __init__(self, square_size=60, **args):
         chess.Board.__init__(self, **args)
         self.square_size = square_size
         self.font_size = min(15, square_size)
@@ -18,28 +18,30 @@ class Board(chess.Board):
         self.white_piece_images = {}
         self.active_piece = -1
         self.active_moves = []
-        self.active_piece_image = self.__load_png(f"./ui/img/other/active_piece.png")
-        self.possible_move_image = self.__load_png(f"./ui/img/other/possible_move.png")
+        self.active_piece_image = self.__load_png(
+            f"./ui/img/other/active_piece.png")
+        self.possible_move_image = self.__load_png(
+            f"./ui/img/other/possible_move.png")
         for letter in letters:
-            self.black_piece_images[letter] = self.__load_png(f"./ui/img/black/{letter}.png")
-            self.white_piece_images[letter] = self.__load_png(f"./ui/img/white/{letter}.png")
-        
-
+            self.black_piece_images[letter] = self.__load_png(
+                f"./ui/img/black/{letter}.png")
+            self.white_piece_images[letter] = self.__load_png(
+                f"./ui/img/white/{letter}.png")
 
     def display(self):
         """
         Creates a thread that shows actual board on pygame screen
         """
-       #self.__display()
-        start = threading.Thread(target = self.__display)
+       # self.__display()
+        start = threading.Thread(target=self.__display)
         start.start()
-
 
     def __display(self):
         pg.init()
         pg.font.init()
         pg.display.set_caption('')
-        self.screen = pg.display.set_mode([8 * self.square_size, 8 * self.square_size])
+        self.screen = pg.display.set_mode(
+            [8 * self.square_size, 8 * self.square_size])
         self.font = pg.font.SysFont('Helvetica', self.font_size)
         running = True
         while running:
@@ -52,7 +54,7 @@ class Board(chess.Board):
             self.__draw_figures()
             self.__draw_letters()
             self.__check_if_piece_selected()
-            #print(self.active_moves)
+            # print(self.active_moves)
             self.__highlight_possible_moves()
             pg.display.flip()
         pg.quit()
@@ -60,32 +62,35 @@ class Board(chess.Board):
     def __draw_board(self):
         for x in range(0, 8 * self.square_size, self.square_size):
             for y in range(x % (2 * self.square_size),
-             x % (2 * self.square_size) + 8 * self.square_size,
-             self.square_size * 2):
-                pg.draw.rect(self.screen, self.white, (x, y, self.square_size, self.square_size))
+                           x % (2 * self.square_size) + 8 * self.square_size,
+                           self.square_size * 2):
+                pg.draw.rect(self.screen, self.white,
+                             (x, y, self.square_size, self.square_size))
 
     def __draw_letters(self):
         """
         function that draw letters 
         """
         for y, index in zip(
-            range(1,8 * self.square_size, self.square_size),
+            range(1, 8 * self.square_size, self.square_size),
             range(8, 0, -1),
-            ):
+        ):
             text_surface = self.font.render(str(index), False, (0, 0, 0))
-            self.screen.blit(text_surface, (1,y))
-        
+            self.screen.blit(text_surface, (1, y))
+
         for x, index in zip(
-            range(self.square_size - self.font_size, 8 * self.square_size, self.square_size),
+            range(self.square_size - self.font_size, 8 *
+                  self.square_size, self.square_size),
             range(65, 73),
-            ):
+        ):
             text_surface = self.font.render(chr(index), False, (0, 0, 0))
-            self.screen.blit(text_surface, (x,self.square_size * 8 - self.font_size)) 
+            self.screen.blit(
+                text_surface, (x, self.square_size * 8 - self.font_size))
 
     def __load_png(self, filename):
-            piece = pg.image.load(filename)
-            piece = pg.transform.scale(piece, (self.square_size, self.square_size))
-            return piece
+        piece = pg.image.load(filename)
+        piece = pg.transform.scale(piece, (self.square_size, self.square_size))
+        return piece
 
     def __draw_figures(self):
         # function that does not work because pip install pynanosvg does not work
@@ -102,10 +107,6 @@ class Board(chess.Board):
             buff = rast.rasterize(svg, w, h)
             image = pg.image.frombuffer(buff, (w, h), 'ARGB')
             surface.blit(image, position)
-
-        
-        #load_png("./img/black/p.png", self.screen, (0,0), (self.square_size, self.square_size))
-
 
         for index, piece in self.piece_map().items():
             if piece.color:
@@ -138,15 +139,15 @@ class Board(chess.Board):
     def __update_active_piece(self):
         if not self.active_piece == -1:
             self.screen.blit(
-                    self.active_piece_image,
-                    (
-                        chess.square_file(self.active_piece) * self.square_size,
-                        (7 - chess.square_rank(self.active_piece)) * self.square_size,
-                        self.square_size,
-                        self.square_size
-                    )
+                self.active_piece_image,
+                (
+                    chess.square_file(self.active_piece) * self.square_size,
+                    (7 - chess.square_rank(self.active_piece)) * self.square_size,
+                    self.square_size,
+                    self.square_size
                 )
-    
+            )
+
     def __check_if_piece_selected(self):
         """
         This function sets activie_piece to index of highlighted piece or -1 of none of the
@@ -156,21 +157,22 @@ class Board(chess.Board):
         if pg.mouse.get_pressed()[0]:
             if self.__square_number(pg.mouse.get_pos()) in self.piece_map().keys():
                 if self.piece_map()[self.__square_number(pg.mouse.get_pos())].color == self.turn:
-                    self.active_piece = self.__square_number(pg.mouse.get_pos())
+                    self.active_piece = self.__square_number(
+                        pg.mouse.get_pos())
                     #self.active_moves = []
-                elif not self.active_piece == -1:   
+                elif not self.active_piece == -1:
                     if self.__square_number(pg.mouse.get_pos()) in [move.to_square for move in self.__legal_moves_from_square(self.active_piece)]:
-                        self.push(self.find_move(self.active_piece, self.__square_number(pg.mouse.get_pos())))
+                        self.push(self.find_move(self.active_piece,
+                                  self.__square_number(pg.mouse.get_pos())))
                         self.active_piece = -1
                         self.active_moves = []
 
-
-            elif not self.active_piece == -1:   
+            elif not self.active_piece == -1:
                 if self.__square_number(pg.mouse.get_pos()) in [move.to_square for move in self.__legal_moves_from_square(self.active_piece)]:
-                    self.push(self.find_move(self.active_piece, self.__square_number(pg.mouse.get_pos())))
+                    self.push(self.find_move(self.active_piece,
+                              self.__square_number(pg.mouse.get_pos())))
                     self.active_piece = -1
                     self.active_moves = []
-
 
         if not self.active_piece == -1:
             if not self.piece_map()[self.active_piece].color == self.turn:
@@ -188,22 +190,11 @@ class Board(chess.Board):
         if not self.active_piece == -1:
             for move in self.__legal_moves_from_square(self.active_piece):
                 self.screen.blit(
-                        self.possible_move_image,
-                        (
-                            chess.square_file(move.to_square) * self.square_size,
-                            (7 - chess.square_rank(move.to_square)) * self.square_size,
-                            self.square_size,
-                            self.square_size
-                        )
+                    self.possible_move_image,
+                    (
+                        chess.square_file(move.to_square) * self.square_size,
+                        (7 - chess.square_rank(move.to_square)) * self.square_size,
+                        self.square_size,
+                        self.square_size
                     )
-
-
-    
-
-
-        
-
-
-
-
-      
+                )
