@@ -5,14 +5,14 @@ import math
 
 
 class Tree:
-    def __init__(self, depth, static_evaluation_function, probability=0.00001):
+    def __init__(self, depth, static_evaluation_function, probability=0.000000001):
         self.best_move = None
         self.evaluation = 0
         self.positions = 0
-        self.max_positions = 35000
+        self.max_positions = 5000
 
         self.depth = depth
-        self.min_depth = depth // 2 + 1
+        self.min_depth = depth
         self.min_probability = probability
 
         self.max_reached_depth = 0
@@ -29,10 +29,10 @@ class Tree:
         for i in range(1, max_depth+1, 1):
             if self.positions > self.max_positions:
                 print(
-                    f"Broke after min:{(i-1)//2 + 1}/{max_depth}, reached: {self.max_reached_depth}")
+                    f"Broke after min:{self.depth}")
                 break
             self.depth = i
-            self.min_depth = self.depth // 2 + 1
+            self.min_depth = self.depth
             self.evaluation = self.__minimax(
                 board, self.depth, 1.0, -math.inf, math.inf)
 
@@ -82,14 +82,13 @@ class Tree:
 
             new_pieces = len(board.piece_map())
 
-            if d <= self.depth or is_check or board.is_check() or can_capture:
-                moves.append(move)
+            moves.append(move)
 
-                evaluation = 0
-                if (board.fen(), self.depth - 1) in self.transposition_table:
-                    evaluation = self.transposition_table[(
-                        board.fen(), self.depth - 1)]
-                evaluations.append(evaluation)
+            evaluation = 0
+            if (board.fen(), self.depth - 1) in self.transposition_table:
+                evaluation = self.transposition_table[(
+                    board.fen(), self.depth - 1)]
+            evaluations.append(evaluation)
 
             board.pop()
 
