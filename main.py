@@ -1,48 +1,32 @@
-import chess
-import chess.pgn
-from tree.tree import *
 import argparse
 import math
-from static_evaluation.static_evaluation import static_evaluation_function
 import time
 from timeit import default_timer as timer
 
+import chess
+import chess.pgn
 
-def main(args):
-    tree = Tree(args.depth)
+from tree.tree import Tree
+from static_evaluation.static_evaluation import static_evaluation_function
+from genetic.population import Population
+from genetic.player import Player
+from genetic.game import Game
 
-    if args.display:
-        from UI.ui import Board
-        board = Board(fen=args.fen)
-        print("DISPLAY")
-        board.display()
-    else:
-        board = chess.Board(fen=args.fen)
 
-    while True:
-        if board.turn == chess.BLACK or args.self_play:
-            start = timer()
-            eval, move = tree.iterative_dfs(
-                board, static_evaluation_function)
-            end = timer()
-            print("Time:", end - start)
-            if move is None:
-                print("Can't make a move.")
-                break
-            print(round(eval, 2), move, tree.positions)
-            board.push(move)
-            print(board)
-        elif not args.display:
-            move = input("Input move: ")
-            move = chess.Move.from_uci(move)
-            if move in board.legal_moves:
-                board.push(move)
-            else:
-                print(f"Incorrect move.\nEnded with position: {board.fen()}")
-                break
+def simple_play(args):
+    white_player = Player(args.depth) if args.self_play else None
+    black_player = Player(args.depth)
 
-    game = chess.pgn.Game.from_board(board)
-    print(game)
+    game = Game(white_player, black_player, display=args.display)
+
+    game.play()
+
+
+def genetic_algorithm(args):
+    population = Population(args.population_size, args.depth)
+    pairs = population.random_pairs(both_sides=False)
+
+    population.run_games(pairs, fen=args.fen)
 
 
 if __name__ == "__main__":
@@ -53,7 +37,10 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--fen', help="Name of the input XML file.",
                         default='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', required=False)
     parser.add_argument('-d', '--depth', help="Maximum search depth.",
-                        default=6, type=float, required=False)
+                        default=16, type=float, required=False)
+
+    parser.add_argument('-p', '--population-size',
+                        help="Population size. Must be even and at least 2.", default=0, type=int)
 
     # Flags
     parser.add_argument('--display', dest="display",
@@ -67,4 +54,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(args)
+    if args.population_size > 1:
+        genetic_algorithm(args)
+    else:
+        simple_play(args)
