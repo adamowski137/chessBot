@@ -9,40 +9,17 @@ import chess.pgn
 from tree.tree import Tree
 from static_evaluation.static_evaluation import static_evaluation_function
 from genetic.population import Population
+from genetic.player import Player
+from genetic.game import Game
 
 
 def simple_play(args):
-    tree = Tree(args.depth, static_evaluation_function)
+    white_player = Player(args.depth) if args.self_play else None
+    black_player = Player(args.depth)
 
-    if args.display:
-        from UI.ui import Board
-        board = Board(fen=args.fen)
-        print("DISPLAY")
-        board.display()
-    else:
-        board = chess.Board(fen=args.fen)
+    game = Game(white_player, black_player, display=args.display)
 
-    while True:
-        if board.turn == chess.BLACK or args.self_play:
-            start = timer()
-            eval, move = tree.iterative_dfs(
-                board)
-            end = timer()
-            print("Time:", end - start)
-            if move is None:
-                print("Can't make a move.")
-                break
-            print(round(eval, 2), move, tree.positions)
-            board.push(move)
-            print(board)
-        elif not args.display:
-            move = input("Input move: ")
-            move = chess.Move.from_uci(move)
-            if move in board.legal_moves:
-                board.push(move)
-            else:
-                print(f"Incorrect move.\nEnded with position: {board.fen()}")
-                break
+    game.play()
 
 
 def genetic_algorithm(args):
