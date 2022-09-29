@@ -1,3 +1,5 @@
+import random
+
 import chess
 
 
@@ -25,10 +27,16 @@ def static_evaluation_function(board, depth):
 
 
 class Evaluation():
-    def __init__(self, points_weight=1, tiles_weight=0.1):
-        self.weights = dict()
-        self.weights['points'] = points_weight
-        self.weights['tiles'] = tiles_weight
+    def __init__(self, weights=None):
+        # self.weights powinno byc tablica zeby miec szybszy access
+        if weights:
+            self.weights = weights
+        else:
+            self.weights = dict()
+            self.weights['points'] = max(0.2, random.gauss(1, 0.5))
+            self.weights['tiles'] = max(0, random.gauss(0.1, 0.05))
+
+            print(self.weights)
 
     def evaluate(self, board, depth):
         outcome = board.outcome()

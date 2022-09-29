@@ -3,6 +3,7 @@ import math
 import time
 from timeit import default_timer as timer
 import os
+import glob
 
 import chess
 import chess.pgn
@@ -33,6 +34,12 @@ def genetic_algorithm(args):
     population.run_games(pairs, fen=args.fen)
 
     if args.save_games:
+        files = glob.glob(f"{args.out}/*")
+        for f in files:
+            os.remove(f)
+
+        population.save_population(
+            os.path.join(args.out, "population.txt"))
         population.save_games(os.path.join(args.out, "games.txt"), args.fen)
 
 
@@ -48,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--population-size',
                         help="Population size. Must be even and at least 2.", default=0, type=int)
     parser.add_argument('-o', '--out', help="Directory to save output files.", type=str,
-                        default='out/', required=False)
+                        default='./out/', required=False)
 
     # Flags
     parser.add_argument('--display', dest="display",

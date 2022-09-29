@@ -9,6 +9,7 @@ class Population():
     def __init__(self, size, depth):
         self.population = [Player(depth) for i in range(size)]
         self.games = []
+        self.generation = 0
         pass
 
     def random_pairs(self, both_sides=False):
@@ -39,8 +40,25 @@ class Population():
                 Game(pair[0], pair[1], fen, game_type, f"Game {i}"))
 
         with Pool(len(pairs)) as p:
-            self.games = p.map(lambda x: x.play(), self.games)
+            new_data = p.map(lambda x: x.play(), self.games)
+            self.games = [data[0] for data in new_data]
+            self.population = []
+
+            for data in new_data:
+                for player in data[1]:
+                    self.population.append(player)
 
     def save_games(self, path, start_fen):
         for game in self.games:
+            with open(path, 'a+') as f:
+                # The indices pairs are always (0,1), (2,3) ... , because of reassignment at run_games()
+                f.write(
+                    f"\n({self.population.index(game.white)},{self.population.index(game.black)})")
+                f.close()
             game.save(path, start_fen)
+
+    def save_population(self, path):
+        for player in self.population:
+            with open(path, 'a+') as f:
+                f.write(f"{player.evaluation_function.weights}\n")
+                f.close()

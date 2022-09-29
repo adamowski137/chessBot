@@ -83,7 +83,7 @@ class Game():
                     else:
                         print(f"Incorrect move. Try again")
 
-        return self
+        return self, (self.white, self.black)
 
     def __self_play(self):
         while not self.board.outcome() and len(self.board.move_stack) < 5:
@@ -111,4 +111,4 @@ class Game():
 
             self.board.push(move)
 
-        return self
+        return self, (self.white, self.black)
