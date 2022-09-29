@@ -49,12 +49,8 @@ class Player():
 
         player = Player(parents[0].get_depth(), new_weights)
 
-        print(player.get_weights())
-
         if random.uniform(0, 1) < mutation_chance:
             player.mutate(mutation_size)
-
-        print(player.get_weights())
 
         return player
 
