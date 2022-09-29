@@ -36,11 +36,12 @@ class Game():
         else:
             return self.__human_play()
 
-    def save(self, path):
+    def save(self, path, start_fen):
         if not self.board.move_stack:
             return
 
         game = chess.pgn.Game()
+        game.headers["FEN"] = start_fen
         node = game.add_variation(self.board.move_stack[0])
         for move in self.board.move_stack[1:]:
             node = node.add_variation(move)

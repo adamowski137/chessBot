@@ -23,7 +23,7 @@ def simple_play(args):
     game.play()
 
     if args.save_games:
-        game.save("games.txt")
+        game.save("games.txt", args.fen)
 
 
 def genetic_algorithm(args):
@@ -33,7 +33,7 @@ def genetic_algorithm(args):
     population.run_games(pairs, fen=args.fen)
 
     if args.save_games:
-        population.save_games(os.path.join(args.out, "games.txt"))
+        population.save_games(os.path.join(args.out, "games.txt"), args.fen)
 
 
 if __name__ == "__main__":

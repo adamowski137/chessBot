@@ -26,8 +26,9 @@ def static_evaluation_function(board, depth):
 
 class Evaluation():
     def __init__(self, points_weight=1, tiles_weight=0.1):
-        self.points = points_weight
-        self.tiles = tiles_weight
+        self.weights = dict()
+        self.weights['points'] = points_weight
+        self.weights['tiles'] = tiles_weight
 
     def evaluate(self, board, depth):
         outcome = board.outcome()
@@ -48,7 +49,10 @@ class Evaluation():
         return self.__evaluate_static(board)
 
     def __evaluate_static(self, board):
-        return self.points * self.__material(board) + self.tiles * self.__controlled_tiles(board)
+        # Network architecture
+        e = self.weights['points'] * self.__material(board)
+        e += self.weights['tiles'] * self.__controlled_tiles(board)
+        return e
 
     def __material(self, board):
         figures = board.piece_map()

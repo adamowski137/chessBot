@@ -41,6 +41,6 @@ class Population():
         with Pool(len(pairs)) as p:
             self.games = p.map(lambda x: x.play(), self.games)
 
-    def save_games(self, path):
+    def save_games(self, path, start_fen):
         for game in self.games:
-            game.save(path)
+            game.save(path, start_fen)
