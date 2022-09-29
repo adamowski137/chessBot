@@ -5,15 +5,17 @@ import math
 
 
 class Tree:
-    def __init__(self, depth, static_evaluation_function, probability=0.000001):
+    def __init__(self, depth, static_evaluation_function, probability=0.00001):
         self.best_move = None
         self.evaluation = 0
         self.positions = 0
-        self.max_positions = 10000
+        self.max_positions = 35000
 
         self.depth = depth
         self.min_depth = depth // 2 + 1
         self.min_probability = probability
+
+        self.max_reached_depth = 0
 
         self.transposition_table = dict()
         self.static_evaluation_function = static_evaluation_function
@@ -23,12 +25,14 @@ class Tree:
         self.transposition_table = dict()
 
         max_depth = int(self.depth)
-        for i in range(1, max_depth+1):
+        self.max_reached_depth = 0
+        for i in range(1, max_depth+1, 1):
             if self.positions > self.max_positions:
-                print(f"Broke at {i}/{max_depth}")
+                print(
+                    f"Broke after min:{(i-1)//2 + 1}/{max_depth}, reached: {self.max_reached_depth}")
                 break
             self.depth = i
-            self.min_depth = i // 2 + 1
+            self.min_depth = self.depth // 2 + 1
             self.evaluation = self.__minimax(
                 board, self.depth, 1.0, -math.inf, math.inf)
 
@@ -57,19 +61,28 @@ class Tree:
 
         # TODO: faster function find
         cur_pieces = len(board.piece_map().items())
-        is_check = board.is_check()
+        is_check = True if board.is_check() else False
 
         d = self.depth - depth
+
+        can_capture = False
+        for move in legal:
+            board.push(move)
+            new_pieces = len(board.piece_map())
+            if new_pieces < cur_pieces:
+                can_capture = True
+                board.pop()
+                break
+            board.pop()
 
         for move in legal:
             n += 1
 
             board.push(move)
 
-            new_pieces = len(board.piece_map().items())
+            new_pieces = len(board.piece_map())
 
-            # Expanding unstable nodes
-            if d <= self.min_depth or is_check or board.is_check() or new_pieces < cur_pieces:
+            if d <= self.depth or is_check or board.is_check() or can_capture:
                 moves.append(move)
 
                 evaluation = 0
@@ -80,12 +93,12 @@ class Tree:
 
             board.pop()
 
-        ordered_move_indices = [i[0] for i in sorted(
-            enumerate(evaluations), key=lambda x:x[1])]
-
         if board.turn:
             ordered_move_indices = [i[0] for i in sorted(
                 enumerate(evaluations), key=lambda x:x[1], reverse=True)]
+        else:
+            ordered_move_indices = [i[0] for i in sorted(
+                enumerate(evaluations), key=lambda x:x[1])]
 
         for idx in ordered_move_indices:
             board.push(moves[idx])
@@ -98,6 +111,9 @@ class Tree:
         if depth == 0 or probability < self.min_probability or board.outcome():
             evaluation = self.static_evaluation_function(board, depth)
             return evaluation
+
+        self.max_reached_depth = max(
+            self.max_reached_depth, self.depth - depth)
 
         if board.turn:
             maxEval = -1000000
