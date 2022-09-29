@@ -16,7 +16,9 @@ def sigmoid(x):
 class Player():
     def __init__(self, depth):
         # generate evaluation_function instead. metaprogramming lessssgooooooooo
-        self.tree = Tree(depth, static_evaluation_function)
+        self.evaluation_function = Evaluation(points_weight=random.uniform(
+            0.8, 1.2), tiles_weight=random.uniform(0.01, 0.2))
+        self.tree = Tree(depth, self.evaluation_function)
         self.fitness = 0
 
     def move(self, board):

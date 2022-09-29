@@ -33,9 +33,14 @@ class Population():
         return pairs
 
     def run_games(self, pairs, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', game_type=GameType.START, reward=GameType.EVEN):
-        games = []
+        self.games = []
         for i, pair in enumerate(pairs):
-            games.append(Game(pair[0], pair[1], fen, game_type, f"Game {i}"))
+            self.games.append(
+                Game(pair[0], pair[1], fen, game_type, f"Game {i}"))
 
         with Pool(len(pairs)) as p:
-            return p.map(lambda x: x.play(), games)
+            return p.map(lambda x: x.play(), self.games)
+
+    def save_games(self, path):
+        for game in self.games:
+            game.write(path)

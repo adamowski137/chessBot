@@ -36,6 +36,9 @@ class Game():
         else:
             return self.__human_play()
 
+    def save(self, path):
+        print(self.board.move_stack)
+
     def __human_play(self):
         computer_player = self.white if self.white else self.black
         while not self.board.outcome():

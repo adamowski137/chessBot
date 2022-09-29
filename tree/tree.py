@@ -77,7 +77,7 @@ class Tree:
         self.positions += 1
         # or checkmate, or stalemate etc.
         if depth == 0 or board.outcome():
-            evaluation = self.static_evaluation_function(board, depth)
+            evaluation = self.static_evaluation_function.evaluate(board, depth)
             return evaluation
 
         if board.turn:

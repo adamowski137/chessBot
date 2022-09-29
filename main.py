@@ -27,6 +27,7 @@ def genetic_algorithm(args):
     pairs = population.random_pairs(both_sides=False)
 
     population.run_games(pairs, fen=args.fen)
+    population.save_games()
 
 
 if __name__ == "__main__":
