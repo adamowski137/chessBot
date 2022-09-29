@@ -14,14 +14,37 @@ def sigmoid(x):
 
 
 class Player():
-    def __init__(self, depth):
+    def __init__(self, depth, weights=None):
         # generate evaluation_function instead. metaprogramming lessssgooooooooo
-        self.evaluation_function = Evaluation()
+        self.evaluation_function = Evaluation(weights)
         self.tree = Tree(depth, self.evaluation_function)
         self.fitness = 0
 
     def move(self, board):
         return self.tree.iterative_dfs(board)
+
+    def mutate(self, size):
+        for key, val in self.evaluation_function.weights.items():
+            sd = val / 4 / 3  # 97.5% ze zmieini sie o max 25%
+            diff = random.gauss(0, sd)
+            self.evaluation_function.weights[key] = val + diff
+
+    @staticmethod
+    def create_offspring(parents, mutation_chance, mutation_size):
+        if not paterns:
+            return Pl
+        new_weights = dict()
+        for key in parents[0]:
+            val = 0
+            for p in parents:
+                val += p[key]
+            new_weights[key] = val / len(parents)
+
+        player = Player(parents[0].depth, new_weights)
+        if random.uniform(0, 1) < mutation_chance:
+            player.mutate(mutation_size)
+
+        return player
 
 
 class NN:
