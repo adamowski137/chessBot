@@ -25,24 +25,36 @@ class Player():
 
     def mutate(self, size):
         for key, val in self.evaluation_function.weights.items():
-            sd = val / 4 / 3  # 97.5% ze zmieini sie o max 25%
+            sd = val * size / 3  # 97.5% ze zmieini sie o max (100*size)%
             diff = random.gauss(0, sd)
             self.evaluation_function.weights[key] = val + diff
 
+    def get_weights(self):
+        return self.evaluation_function.weights
+
+    def get_depth(self):
+        return self.tree.depth
+
     @staticmethod
     def create_offspring(parents, mutation_chance, mutation_size):
-        if not paterns:
-            return Pl
+        if not parents:
+            print("Created a default offspring, because no parents were provided.")
+            return Player()
         new_weights = dict()
-        for key in parents[0]:
+        for key in parents[0].get_weights():
             val = 0
             for p in parents:
-                val += p[key]
+                val += p.get_weights()[key]
             new_weights[key] = val / len(parents)
 
-        player = Player(parents[0].depth, new_weights)
+        player = Player(parents[0].get_depth(), new_weights)
+
+        print(player.get_weights())
+
         if random.uniform(0, 1) < mutation_chance:
             player.mutate(mutation_size)
+
+        print(player.get_weights())
 
         return player
 
