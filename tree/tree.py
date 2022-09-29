@@ -12,6 +12,7 @@ class Tree:
         self.max_positions = 10000
 
         self.depth = depth
+        self.min_depth = depth // 2 + 1
         self.min_probability = probability
 
         self.transposition_table = dict()
@@ -27,6 +28,7 @@ class Tree:
                 print(f"Broke at {i}/{max_depth}")
                 break
             self.depth = i
+            self.min_depth = i // 2 + 1
             self.evaluation = self.__minimax(
                 board, self.depth, 1.0, -math.inf, math.inf)
 
@@ -42,7 +44,7 @@ class Tree:
 
         return self.evaluation, self.best_move
 
-    def __children(self, board):
+    def __children(self, board, depth):
         """
         Function that yields all boards available from the given one,
         in a sorted order by calculated evaluations.
@@ -53,17 +55,28 @@ class Tree:
         legal = board.legal_moves
         n = 0
 
+        # TODO: faster function find
+        cur_pieces = len(board.piece_map().items())
+        is_check = board.is_check()
+
+        d = self.depth - depth
+
         for move in legal:
             n += 1
 
             board.push(move)
 
-            moves.append(move)
-            evaluation = 0
-            if (board.fen(), self.depth - 1) in self.transposition_table:
-                evaluation = self.transposition_table[(
-                    board.fen(), self.depth - 1)]
-            evaluations.append(evaluation)
+            new_pieces = len(board.piece_map().items())
+
+            # Expanding unstable nodes
+            if d <= self.min_depth or is_check or board.is_check() or new_pieces < cur_pieces:
+                moves.append(move)
+
+                evaluation = 0
+                if (board.fen(), self.depth - 1) in self.transposition_table:
+                    evaluation = self.transposition_table[(
+                        board.fen(), self.depth - 1)]
+                evaluations.append(evaluation)
 
             board.pop()
 
@@ -88,7 +101,7 @@ class Tree:
 
         if board.turn:
             maxEval = -1000000
-            for n, child in self.__children(board):
+            for n, child in self.__children(board, depth):
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
@@ -113,7 +126,7 @@ class Tree:
             return maxEval
         else:
             minEval = 1000000
-            for n, child in self.__children(board):
+            for n, child in self.__children(board, depth):
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
