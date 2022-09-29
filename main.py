@@ -38,7 +38,7 @@ if __name__ == "__main__":
     parser.add_argument('-f', '--fen', help="Name of the input XML file.",
                         default='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', required=False)
     parser.add_argument('-d', '--depth', help="Maximum search depth.",
-                        default=16, type=int, required=False)
+                        default=6, type=int, required=False)
 
     parser.add_argument('-p', '--population-size',
                         help="Population size. Must be even and at least 2.", default=0, type=int)

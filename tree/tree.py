@@ -5,14 +5,13 @@ import math
 
 
 class Tree:
-    def __init__(self, depth, static_evaluation_function, probability=0.000000001):
+    def __init__(self, depth, static_evaluation_function, probability=0.0000001):
         self.best_move = None
         self.evaluation = 0
         self.positions = 0
-        self.max_positions = 5000
 
         self.depth = depth
-        self.min_depth = depth
+        self.max_depth = depth
         self.min_probability = probability
 
         self.max_reached_depth = 0
@@ -24,19 +23,15 @@ class Tree:
         self.positions = 0
         self.transposition_table = dict()
 
-        max_depth = int(self.depth)
         self.max_reached_depth = 0
-        for i in range(1, max_depth+1, 1):
-            if self.positions > self.max_positions:
-                print(
-                    f"Broke after min:{self.depth}")
-                break
+        for i in range(1, self.max_depth+1, 1):
             self.depth = i
-            self.min_depth = self.depth
             self.evaluation = self.__minimax(
                 board, self.depth, 1.0, -math.inf, math.inf)
 
-        self.depth = max_depth
+        self.depth = self.max_depth
+
+        print(f"Reached up to {self.max_reached_depth}")
 
         return self.evaluation, self.best_move
 
@@ -60,27 +55,14 @@ class Tree:
         n = 0
 
         # TODO: faster function find
-        cur_pieces = len(board.piece_map().items())
-        is_check = True if board.is_check() else False
+        is_check = board.is_check()
 
         d = self.depth - depth
-
-        can_capture = False
-        for move in legal:
-            board.push(move)
-            new_pieces = len(board.piece_map())
-            if new_pieces < cur_pieces:
-                can_capture = True
-                board.pop()
-                break
-            board.pop()
 
         for move in legal:
             n += 1
 
             board.push(move)
-
-            new_pieces = len(board.piece_map())
 
             moves.append(move)
 
@@ -91,6 +73,9 @@ class Tree:
             evaluations.append(evaluation)
 
             board.pop()
+
+        if not moves:
+            yield 0, []
 
         if board.turn:
             ordered_move_indices = [i[0] for i in sorted(
@@ -104,19 +89,41 @@ class Tree:
             yield n, board
             board.pop()
 
+    def __was_capture(self, board):
+        if not board.move_stack:
+            return True
+
+        cur_pieces = len(board.piece_map().items())
+        last_move = board.pop()
+        bef_pieces = len(board.piece_map().items())
+        board.push(last_move)
+
+        if cur_pieces < bef_pieces:
+            return True
+
+        return False
+
     def __minimax(self, board, depth, probability, alpha, beta):
         self.positions += 1
         # or checkmate, or stalemate etc.
-        if depth == 0 or probability < self.min_probability or board.outcome():
-            evaluation = self.static_evaluation_function(board, depth)
-            return evaluation
+        if board.outcome():
+            return self.static_evaluation_function(board, depth)
+        elif self.depth < self.max_depth and (depth <= 0):
+            return self.static_evaluation_function(board, depth)
+        elif self.depth == self.max_depth and not self.__was_capture(board):
+            return self.static_evaluation_function(board, depth)
 
         self.max_reached_depth = max(
-            self.max_reached_depth, self.depth - depth)
+            self.max_reached_depth, self.depth - depth + 1)
 
         if board.turn:
             maxEval = -1000000
             for n, child in self.__children(board, depth):
+                if n == 0:
+                    maxEval = max(
+                        maxEval, self.static_evaluation_function(board, depth))
+                    break
+
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
@@ -142,6 +149,11 @@ class Tree:
         else:
             minEval = 1000000
             for n, child in self.__children(board, depth):
+                if n == 0:
+                    minEval = min(
+                        minEval, self.static_evaluation_function(board, depth))
+                    break
+
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
