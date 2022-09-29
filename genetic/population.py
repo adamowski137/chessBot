@@ -1,4 +1,5 @@
 import random
+from multiprocess import Pool
 
 from genetic.player import Player
 from genetic.game import Game, GameType
@@ -10,7 +11,7 @@ class Population():
         self.games = []
         pass
 
-    def random_pairs(self):
+    def random_pairs(self, both_sides=False):
         indices = [i for i in range(len(self.population))]
 
         pairs = []
@@ -24,6 +25,11 @@ class Population():
 
             pairs.append((player1, player2))
 
+        if both_sides:
+            for i in range(len(self.population) // 2):
+                new_pair = pairs[i][1], pairs[i][0]
+                pairs.append(new_pair)
+
         return pairs
 
     def run_games(self, pairs, fen='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', game_type=GameType.START, reward=GameType.EVEN):
@@ -31,5 +37,5 @@ class Population():
         for i, pair in enumerate(pairs):
             games.append(Game(pair[0], pair[1], fen, game_type, f"Game {i}"))
 
-        for g in games:
-            g.play()
+        with Pool(len(pairs)) as p:
+            return p.map(lambda x: x.play(), games)

@@ -9,7 +9,7 @@ class Tree:
         self.best_move = None
         self.evaluation = 0
         self.positions = 0
-        self.max_positions = 5000
+        self.max_positions = 10000
         self.depth = depth
         self.transposition_table = dict()
         self.static_evaluation_function = static_evaluation_function

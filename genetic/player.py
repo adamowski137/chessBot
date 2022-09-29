@@ -17,6 +17,7 @@ class Player():
     def __init__(self, depth):
         # generate evaluation_function instead. metaprogramming lessssgooooooooo
         self.tree = Tree(depth, static_evaluation_function)
+        self.fitness = 0
 
     def move(self, board):
         return self.tree.iterative_dfs(board)

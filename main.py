@@ -47,7 +47,8 @@ def simple_play(args):
 
 def genetic_algorithm(args):
     population = Population(args.population_size, args.depth)
-    pairs = population.random_pairs()
+    pairs = population.random_pairs(both_sides=False)
+
     population.run_games(pairs, fen=args.fen)
 
 

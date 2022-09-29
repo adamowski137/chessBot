@@ -24,23 +24,25 @@ class Game():
         self.name = name
 
     def play(self):
-        while not self.board.outcome():
+        while not self.board.outcome() and len(self.board.move_stack) < 20:
             start_timer = time.perf_counter()
-            eval, move = 0, None
+            evaluation, move = 0, None
             if self.board.turn == chess.WHITE:
-                eval, move = self.white.move(self.board)
+                evaluation, move = self.white.move(self.board)
             else:
-                eval, move = self.black.move(self.board)
+                evaluation, move = self.black.move(self.board)
             end_timer = time.perf_counter()
             if move is None:
                 print(
-                    f"No available move for white at game: \"{self.name}\"")
+                    f"No available move for at game: \"{self.name}\"")
                 break
 
             if self.board.turn == chess.WHITE:
                 print(
-                    f"E: {eval}, M: {move}, T: {end_timer-start_timer}s, P: {self.white.tree.positions}")
+                    f"{self.name} - E: {round(evaluation, 2)}, M: {move}, T: {round(end_timer-start_timer, 2)}s, P: {self.white.tree.positions}")
             else:
                 print(
-                    f"E: {eval}, M: {move}, T: {end_timer-start_timer}s, P: {self.black.tree.positions}")
+                    f"{self.name} - E: {round(evaluation, 2)}, M: {move}, T: {round(end_timer-start_timer, 2)}s, P: {self.black.tree.positions}")
             self.board.push(move)
+
+        return self.board.outcome()
