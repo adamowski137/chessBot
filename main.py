@@ -25,7 +25,7 @@ def simple_play(args):
     game.play()
 
     if args.save_games:
-        game.save("games.txt", args.fen)
+        game.save(os.path.join(args.out, "game.txt"), args.fen)
 
 
 def genetic_algorithm(args):

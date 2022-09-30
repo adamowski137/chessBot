@@ -104,7 +104,6 @@ class Tree:
 
     def __minimax(self, board, depth, probability, alpha, beta):
         self.positions += 1
-        # or checkmate, or stalemate etc.
         if board.outcome():
             return self.static_evaluation_function.evaluate(board, depth)
         elif self.depth < self.max_depth and (depth <= 0):

@@ -1,3 +1,4 @@
+import argparse
 import random
 
 import chess
@@ -33,8 +34,8 @@ class Evaluation():
             self.weights = weights
         else:
             self.weights = dict()
-            self.weights['points'] = max(0.2, random.gauss(1, 0.5))
-            self.weights['tiles'] = max(0, random.gauss(0.1, 0.05))
+            self.weights['points'] = max(0.2, random.gauss(1, 0.005))
+            self.weights['tiles'] = 0
 
             print(self.weights)
 
@@ -79,7 +80,21 @@ class Evaluation():
         board.push(chess.Move.null())
         defenderTiles = board.legal_moves.count()
         board.pop()
+
         if board.turn:
             return attackerTiles - defenderTiles
         else:
             return defenderTiles - attackerTiles
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Chess evaluation")
+    parser.add_argument('-f', '--fen', help="Name of the input XML file.",
+                        default='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1', required=False)
+    args = parser.parse_args()
+
+    evaluation = Evaluation()
+    board = chess.Board(args.fen)
+
+    print(evaluation.evaluate(board, 0))

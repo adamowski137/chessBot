@@ -86,7 +86,7 @@ class Game():
         return self, (self.white, self.black)
 
     def __self_play(self):
-        while not self.board.outcome() and len(self.board.move_stack) < 5:
+        while not self.board.outcome():
             start_timer = time.perf_counter()
             evaluation, move = 0, None
 
