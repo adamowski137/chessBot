@@ -5,7 +5,7 @@ import math
 
 
 class Tree:
-    def __init__(self, depth, static_evaluation_function, probability=0.0000001):
+    def __init__(self, depth, static_evaluation_function, probability=0.0000001, show_branch=False):
         self.best_move = None
         self.evaluation = 0
         self.positions = 0
@@ -18,15 +18,49 @@ class Tree:
         self.transposition_table = dict()
         self.static_evaluation_function = static_evaluation_function
 
+        self.show_branch = show_branch
+
     def iterative_dfs(self, board):
         self.positions = 0
         self.transposition_table = dict()
 
         self.max_reached_depth = 0
-        for i in range(1, self.max_depth+1, 1):
+        for i in range(1, self.max_depth+1):
             self.depth = i
             self.evaluation = self.__minimax(
-                board, self.depth, 1.0, -math.inf, math.inf)
+                board, i, 1.0, -math.inf, math.inf)
+
+        print("Best branch")
+        print(self.best_move)
+        # board.push(self.best_move)
+        print(self.transposition_table)
+        for i in range(self.max_depth):
+            legal = board.legal_moves
+            best_move = None
+            best_eval = -math.inf if board.turn else math.inf
+            for move in legal:
+                board.push(move)
+
+                if (board.fen(), self.max_depth) not in self.transposition_table:
+                    board.pop()
+                    continue
+
+                val = self.transposition_table[(
+                    board.fen(), self.max_depth)]
+
+                if board.turn:
+                    if val > best_eval:
+                        best_move = move
+                else:
+                    if val < best_eval:
+                        best_move = move
+
+                board.pop()
+            print(best_move)
+            board.push(best_move)
+
+        for i in range(self.max_depth):
+            board.pop()
 
         self.depth = self.max_depth
 
@@ -53,11 +87,6 @@ class Tree:
         legal = board.legal_moves
         n = 0
 
-        # TODO: faster function find
-        is_check = board.is_check()
-
-        d = self.depth - depth
-
         for move in legal:
             n += 1
 
@@ -72,9 +101,6 @@ class Tree:
             evaluations.append(evaluation)
 
             board.pop()
-
-        if not moves:
-            yield 0, []
 
         if board.turn:
             ordered_move_indices = [i[0] for i in sorted(
@@ -106,9 +132,9 @@ class Tree:
         self.positions += 1
         if board.outcome():
             return self.static_evaluation_function.evaluate(board, depth)
-        elif self.depth < self.max_depth and (depth <= 0):
+        elif self.depth < self.max_depth and depth <= 0:
             return self.static_evaluation_function.evaluate(board, depth)
-        elif self.depth == self.max_depth and not self.__was_capture(board):
+        elif self.depth == self.max_depth and not (self.__was_capture(board) or board.is_check()):
             return self.static_evaluation_function.evaluate(board, depth)
 
         self.max_reached_depth = max(
@@ -117,11 +143,6 @@ class Tree:
         if board.turn:
             maxEval = -1000000
             for n, child in self.__children(board, depth):
-                if n == 0:
-                    maxEval = max(
-                        maxEval, self.static_evaluation_function(board, depth))
-                    break
-
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
@@ -147,11 +168,6 @@ class Tree:
         else:
             minEval = 1000000
             for n, child in self.__children(board, depth):
-                if n == 0:
-                    minEval = min(
-                        minEval, self.static_evaluation_function(board, depth))
-                    break
-
                 evaluation = 0
                 if (child.fen(), self.depth) not in self.transposition_table:
                     evaluation = self.__minimax(child, depth -
@@ -174,3 +190,6 @@ class Tree:
                     break
 
             return minEval
+
+    def __print_branch(self, board):
+        pass

@@ -14,9 +14,10 @@ def sigmoid(x):
 
 
 class Player():
-    def __init__(self, depth, weights=None):
+    def __init__(self, depth, weights=None, show_branch=False):
         self.evaluation_function = Evaluation(weights)
-        self.tree = Tree(depth, self.evaluation_function)
+        self.tree = Tree(depth, self.evaluation_function,
+                         show_branch=show_branch)
         self.fitness = 0
 
     def move(self, board):

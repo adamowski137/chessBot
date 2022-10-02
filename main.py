@@ -17,8 +17,8 @@ from genetic.game import Game
 
 def simple_play(args):
     white_player = Player(
-        args.depth) if args.self_play else None
-    black_player = Player(args.depth)
+        args.depth, show_branch=args.show_branch) if args.self_play else None
+    black_player = Player(args.depth, show_branch=args.show_branch)
 
     game = Game(white_player, black_player, fen=args.fen, display=args.display)
 
@@ -66,11 +66,14 @@ if __name__ == "__main__":
                         help="Play the game against itself.", action='store_true')
     parser.add_argument('--save-games', dest="save_games",
                         help="Save played games into a file.", action='store_true')
+    parser.add_argument('--show-branch', dest="show_branch",
+                        help="After each move, shows the best branch from the search tree. Significantly slows down the algorithm!", action="store_true")
 
     # Default flags
     parser.set_defaults(display=False)
     parser.set_defaults(self_play=False)
     parser.set_defaults(save_games=False)
+    parser.set_defaults(show_branch=False)
 
     args = parser.parse_args()
 

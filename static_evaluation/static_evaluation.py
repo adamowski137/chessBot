@@ -35,7 +35,7 @@ class Evaluation():
         else:
             self.weights = dict()
             self.weights['points'] = max(0.2, random.gauss(1, 0.005))
-            self.weights['tiles'] = 0
+            self.weights['tiles'] = max(0, random.gauss(0.1, 0.005))
 
             print(self.weights)
 
